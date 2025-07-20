@@ -5,9 +5,11 @@ import (
 	"github.com/go-playground/validator/v10"
 	"io"
 	"net/http"
+	"url-shortner/internal/service"
 )
 
 type UrlHandler struct {
+	urlService *service.UrlService
 }
 
 var validate *validator.Validate
@@ -17,7 +19,9 @@ func init() {
 }
 
 func NewUrlHandler() *UrlHandler {
-	return &UrlHandler{}
+	return &UrlHandler{
+		urlService: service.NewUrlService(),
+	}
 }
 
 func (handler *UrlHandler) RegisterRoutes(router *chi.Mux) {
@@ -49,7 +53,13 @@ func (handler *UrlHandler) PostUrl(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
+	shortUrl, err := handler.urlService.CreateShortUrl(url)
+	if err != nil {
+		http.Error(writer, "Внутренняя ошибка сервера при создании URL", http.StatusInternalServerError)
+		return
+	}
+
 	writer.Header().Set("Content-Type", "text/plain")
 	writer.WriteHeader(http.StatusCreated)
-	io.WriteString(writer, "localhost/testShortedUrl")
+	io.WriteString(writer, shortUrl)
 }
