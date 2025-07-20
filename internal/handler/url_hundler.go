@@ -26,6 +26,7 @@ func NewUrlHandler() *UrlHandler {
 
 func (handler *UrlHandler) RegisterRoutes(router *chi.Mux) {
 	router.Post("/", handler.PostUrl)
+	router.Get("/{shortCode}", handler.GetOrigin)
 }
 
 func (handler *UrlHandler) PostUrl(writer http.ResponseWriter, request *http.Request) {
@@ -62,4 +63,21 @@ func (handler *UrlHandler) PostUrl(writer http.ResponseWriter, request *http.Req
 	writer.Header().Set("Content-Type", "text/plain")
 	writer.WriteHeader(http.StatusCreated)
 	io.WriteString(writer, shortUrl)
+}
+
+func (handler *UrlHandler) GetOrigin(writer http.ResponseWriter, request *http.Request) {
+	if request.Method != http.MethodGet {
+		writer.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	shortCode := chi.URLParam(request, "shortCode")
+
+	origin, isSuccess := handler.urlService.GetOriginalUrlByShortCode(shortCode)
+
+	if !isSuccess {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
+	writer.Header().Set("Location", origin)
+	writer.WriteHeader(http.StatusTemporaryRedirect)
 }
