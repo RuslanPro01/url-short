@@ -3,16 +3,19 @@ package service
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"url-shortner/config"
 	"url-shortner/internal/repository"
 )
 
 type urlService struct {
 	repo repository.URLRepository
+	cfg  *config.Config
 }
 
-func NewUrlService(repo repository.URLRepository) URLServiceProvider {
+func NewUrlService(repo repository.URLRepository, cfg *config.Config) URLServiceProvider {
 	return &urlService{
 		repo: repo,
+		cfg:  cfg,
 	}
 }
 
@@ -23,7 +26,7 @@ func (s *urlService) CreateShortUrl(originalUrl string) (string, error) {
 		return "", err
 	}
 
-	return "localhost/" + shortCode, nil
+	return s.cfg.BaseUrl + shortCode, nil
 }
 
 func (s *urlService) GetOriginalUrlByShortCode(shortCode string) (string, bool) {
