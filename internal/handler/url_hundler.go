@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"io"
+	"mime"
 	"net/http"
 	"url-shortner/internal/service"
 )
@@ -35,8 +36,15 @@ func (handler *UrlHandler) PostUrl(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	if request.Header.Get("Content-Type") != "text/plain" {
-		http.Error(writer, "Нужен url для сокращения в формате text/plain", http.StatusBadRequest)
+	contentType := request.Header.Get("Content-Type")
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		http.Error(writer, "Некорректный заголовок Content-Type", http.StatusBadRequest)
+		return
+	}
+
+	if mediaType != "text/plain" {
+		http.Error(writer, "Content-Type должен быть text/plain", http.StatusBadRequest)
 		return
 	}
 
