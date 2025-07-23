@@ -6,13 +6,16 @@ import (
 	"net/http"
 	urlhandler "url-shortner/internal/handler"
 	"url-shortner/internal/middleware"
+	"url-shortner/internal/repository"
+	"url-shortner/internal/service"
 )
 
 func main() {
+	repo := repository.NewUrlRepository()
+	urlSvc := service.NewUrlService(repo)
+	handler := urlhandler.NewUrlHandler(urlSvc)
+
 	router := chi.NewRouter()
-
-	handler := urlhandler.NewUrlHandler()
-
 	router.Use(chiMiddleware.Logger)
 	router.Use(chiMiddleware.Recoverer)
 	router.Use(middleware.CheckBodyNotEmpty)

@@ -6,19 +6,19 @@ import (
 	"url-shortner/internal/repository"
 )
 
-type UrlService struct {
-	urlRepository *repository.UrlRepository
+type urlService struct {
+	repo repository.URLRepository
 }
 
-func NewUrlService() *UrlService {
-	return &UrlService{
-		urlRepository: repository.NewUrlRepository(),
+func NewUrlService(repo repository.URLRepository) URLServiceProvider {
+	return &urlService{
+		repo: repo,
 	}
 }
 
-func (s *UrlService) CreateShortUrl(originalUrl string) (string, error) {
+func (s *urlService) CreateShortUrl(originalUrl string) (string, error) {
 	shortCode, err := generateShortCode(8)
-	s.urlRepository.PushShortedCode(originalUrl, shortCode)
+	s.repo.PushShortedCode(originalUrl, shortCode)
 	if err != nil {
 		return "", err
 	}
@@ -26,8 +26,8 @@ func (s *UrlService) CreateShortUrl(originalUrl string) (string, error) {
 	return "localhost/" + shortCode, nil
 }
 
-func (s *UrlService) GetOriginalUrlByShortCode(shortCode string) (string, bool) {
-	originalUrl, isSuccess := s.urlRepository.GetOriginalUrl(shortCode)
+func (s *urlService) GetOriginalUrlByShortCode(shortCode string) (string, bool) {
+	originalUrl, isSuccess := s.repo.GetOriginalUrl(shortCode)
 	return originalUrl, isSuccess
 }
 

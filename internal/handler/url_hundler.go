@@ -9,7 +9,7 @@ import (
 )
 
 type UrlHandler struct {
-	urlService *service.UrlService
+	urlService service.URLServiceProvider
 }
 
 var validate *validator.Validate
@@ -18,9 +18,9 @@ func init() {
 	validate = validator.New()
 }
 
-func NewUrlHandler() *UrlHandler {
+func NewUrlHandler(service service.URLServiceProvider) *UrlHandler {
 	return &UrlHandler{
-		urlService: service.NewUrlService(),
+		urlService: service,
 	}
 }
 
