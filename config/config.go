@@ -12,7 +12,7 @@ type Config struct {
 
 func ParseFlags() (*Config, error) {
 	pflag.String("a", ":8080", "Адрес запуска HTTP сервера")
-	pflag.String("b", "example.com/", "Базовый адрес для сокращенных URL")
+	pflag.String("b", "https://ya.ru/", "Базовый адрес для сокращенных URL")
 	pflag.Parse()
 
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
